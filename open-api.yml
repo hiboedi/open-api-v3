@@ -1,0 +1,322 @@
+openapi: "3.0.3"
+info:
+  title: Setting API doc
+  version: "1.1"
+  description: Testing Open API 3.0
+  termsOfService: https://www.github.com/hiboedi
+  contact:
+    email: hi.boedi8@gmail.com
+    name: Boedi
+    url: https://www.github.com/hiboedi
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: https://{environment}.boedi.com/api/v1
+    description: API path Resful API
+    variables:
+      environment:
+        default: dev
+        enum:
+          - prod
+          - qa
+          - dev
+externalDocs:
+  url: https://www.gdrive.com/hiboedi
+  description: Github Repo
+
+components:
+  securitySchemes:
+    ToDoListAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: auth for restfull api
+
+  parameters:
+    ToDoListId:
+      name: todolistId
+      in: path
+      required: true
+      description: todolistId for delete
+      schema:
+        type: string
+        nullable: false
+        minLength: 1
+        maxLength: 36
+      examples:
+        boedi:
+          value: 1
+          description: example todolist id for boedi
+        rizky:
+          value: 2
+          description: example todolist id for rizky
+
+  schemas:
+    ToDoList:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        priority:
+          type: integer
+          format: int64
+        tags:
+          type: array
+          items:
+            type: string
+    CreateOrUpdateToDoList:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          required:
+            - name
+        priority:
+          type: integer
+          format: int32
+          default: 1
+        tags:
+          type: array
+          minLength: 1
+          items:
+            type: string
+            minLength: 1
+    ArrayToDoList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ToDoList"
+
+paths:
+  /todolist:
+    get:
+      security:
+        - ToDoListAuth: []
+
+      tags:
+        - ToDoList
+      summary: Get all to do list
+      description: Get all to do list by default
+      parameters:
+        - name: include done
+          in: query
+          schema:
+            type: boolean
+            default: true
+            nullable: true
+            enum:
+              - false
+              - true
+          required: false
+          description: is include done to do list
+        - name: name
+          in: query
+          schema:
+            type: string
+            nullable: true
+            maxLength: 100
+            minLength: 1
+          required: false
+          description: filter to do list by name
+          examples:
+            boedi:
+              value: Boedi
+              description: example name boedi
+            rizky:
+              value: rizky
+              description: example name rizky
+      responses:
+        "200":
+          description: Success to get all todolist
+          content:
+            applicatiion/json:
+              examples:
+                boedi:
+                  description: create boedi todolist
+                  value:
+                    name: boedi
+                    priority: 5
+                    tags:
+                      - golang
+                      - programming
+                rizky:
+                  description: create rizky todolist
+                  value:
+                    name: rizky
+                    priority: 3
+                    tags:
+                      - germany
+                      - programming
+                success:
+                  description: Example get all todolist
+                  value:
+                    - id: 1
+                      name: boedi
+                      priority: 5
+                      tags:
+                        - golang
+                        - programming
+                    - id: 2
+                      name: rizky
+                      priority: 3
+                      tags:
+                        - germany
+                        - programming
+              schema:
+                $ref: "#/components/schemas/ArrayToDoList"
+
+    post:
+      security:
+        - ToDoListAuth: []
+      tags:
+        - ToDoList
+      summary: Create new to do list
+      description: Create new to do list to database
+      requestBody:
+        required: true
+        content:
+          applicatiion/json:
+            examples:
+              boedi:
+                description: create todolist boedi
+                value:
+                  name: boedi
+                  priority: 5
+                  tags:
+                    - golang
+                    - programming
+              rizky:
+                description: create todolist rizky
+                value:
+                  name: rizky
+                  priority: 3
+                  tags:
+                    - germany
+                    - programming
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdateToDoList"
+      responses:
+        "200":
+          description: Success created todolist
+          content:
+            applicatiion/json:
+              examples:
+                boedi:
+                  description: create boedi todolist
+                  value:
+                    name: boedi
+                    priority: 5
+                    tags:
+                      - golang
+                      - programming
+                rizky:
+                  description: create rizky todolist
+                  value:
+                    name: rizky
+                    priority: 3
+                    tags:
+                      - germany
+                      - programming
+              schema:
+                $ref: "#/components/schemas/ToDoList"
+
+  /todolist/{todolistId}:
+    put:
+      security:
+        - ToDoListAuth: []
+      tags:
+        - ToDoList
+      summary: Update eisting to do list
+      description: Update eisting to do list in database
+      requestBody:
+        required: true
+        content:
+          applicatiion/json:
+            examples:
+              boedi:
+                description: create todolist boedi
+                value:
+                  name: boedi
+                  priority: 5
+                  tags:
+                    - golang
+                    - programming
+              rizky:
+                description: create todolist rizky
+                value:
+                  name: rizky
+                  priority: 3
+                  tags:
+                    - germany
+                    - programming
+            schema:
+              $ref: "#/components/schemas/CreateOrUpdateToDoList"
+
+      parameters:
+        - $ref: "#/components/parameters/ToDoListId"
+
+      responses:
+        "200":
+          description: Success update todolist
+          content:
+            applicatiion/json:
+              examples:
+                boedi:
+                  description: update boedi todolist
+                  value:
+                    name: boedi
+                    priority: 5
+                    tags:
+                      - golang
+                      - programming
+                rizky:
+                  description: update rizky todolist
+                  value:
+                    name: rizky
+                    priority: 3
+                    tags:
+                      - germany
+                      - programming
+              schema:
+                $ref: "#/components/schemas/ToDoList"
+    delete:
+      security:
+        - ToDoListAuth: []
+      tags:
+        - ToDoList
+      summary: Delete existing to do list
+      description: Delete existing to do list in database
+      parameters:
+        - $ref: "#/components/parameters/ToDoListId"
+      responses:
+        "200":
+          description: Success delete todolist
+          content:
+            applicatiion/json:
+              example:
+                success:
+                  description: Success deleted todolist
+                  value:
+                    success: true
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "404":
+          description: Failed delete not found todolist
+          content:
+            applicatiion/json:
+              example:
+                success:
+                  description: Failed deleted todolist
+                  value:
+                    success: false
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
